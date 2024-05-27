@@ -1,4 +1,5 @@
 from scapy import packet
+from scapy.packet import NoPayload
 from constants import (
     WIFI_INTERFACE,
     ROUTER_MAC,
@@ -26,18 +27,17 @@ def dropping_callback(packet):
         and packet[IP].src == IPHONE_IP
         and packet[Ether].dst == MY_MAC.lower()
     ):
-        packet[Ether].dst = ROUTER_MAC.lower()
-        sendp(packet, verbose=False)
+        ip = packet.getlayer(IP)
+        send(ip, verbose=False)
         print("Caught packet")
     elif (
         IP in packet
         and packet[IP].dst == IPHONE_IP
         and packet[Ether].dst == MY_MAC.lower()
     ):
-        print("Return")
-        packet[Ether].dst = IVAN_PHONE_MAC.lower()
-        sendp(packet, verbose=False)
-        packet.show()
+        print("Returned packet")
+        ip = packet.getlayer(IP)
+        send(ip, verbose=False)
 
 
 sniff(prn=dropping_callback)
